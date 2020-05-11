@@ -19,68 +19,71 @@ from model import NASNetworkCIFAR, NASNetworkImageNet
 from model_search import NASWSNetworkCIFAR, NASWSNetworkImageNet
 from controller import NAO
 
-parser = argparse.ArgumentParser(description='NAO CIFAR-10')
 
-# Basic model parameters.
-parser.add_argument('--mode', type=str, default='train', choices=['train', 'test'])
-parser.add_argument('--data', type=str, default='./data')
-parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10, cifar100, imagenet'])
-parser.add_argument('--zip_file', action='store_true', default=False)
-parser.add_argument('--lazy_load', action='store_true', default=False)
-parser.add_argument('--output_dir', type=str, default='models')
-parser.add_argument('--seed', type=int, default=0)
-parser.add_argument('--child_batch_size', type=int, default=64)
-parser.add_argument('--child_eval_batch_size', type=int, default=500)
-parser.add_argument('--child_epochs', type=int, default=150)
-parser.add_argument('--child_layers', type=int, default=3)
-parser.add_argument('--child_nodes', type=int, default=5)
-parser.add_argument('--child_channels', type=int, default=20)
-parser.add_argument('--child_cutout_size', type=int, default=None)
-parser.add_argument('--child_grad_bound', type=float, default=5.0)
-parser.add_argument('--child_lr_max', type=float, default=0.025)
-parser.add_argument('--child_lr_min', type=float, default=0.001)
-parser.add_argument('--child_keep_prob', type=float, default=1.0)
-parser.add_argument('--child_drop_path_keep_prob', type=float, default=0.9)
-parser.add_argument('--child_l2_reg', type=float, default=3e-4)
-parser.add_argument('--child_use_aux_head', action='store_true', default=False)
-parser.add_argument('--child_eval_epochs', type=str, default='30')
-parser.add_argument('--child_arch_pool', type=str, default=None)
-parser.add_argument('--child_lr', type=float, default=0.1)
-parser.add_argument('--child_label_smooth', type=float, default=0.1, help='label smoothing')
-parser.add_argument('--child_gamma', type=float, default=0.97, help='learning rate decay')
-parser.add_argument('--child_decay_period', type=int, default=1, help='epochs between two learning rate decays')
-parser.add_argument('--controller_seed_arch', type=int, default=600)
-parser.add_argument('--controller_expand', type=int, default=None)
-parser.add_argument('--controller_new_arch', type=int, default=300)
-parser.add_argument('--controller_encoder_layers', type=int, default=1)
-parser.add_argument('--controller_encoder_hidden_size', type=int, default=96)
-parser.add_argument('--controller_encoder_emb_size', type=int, default=48)
-parser.add_argument('--controller_mlp_layers', type=int, default=3)
-parser.add_argument('--controller_mlp_hidden_size', type=int, default=200)
-parser.add_argument('--controller_decoder_layers', type=int, default=1)
-parser.add_argument('--controller_decoder_hidden_size', type=int, default=96)
-parser.add_argument('--controller_source_length', type=int, default=40)
-parser.add_argument('--controller_encoder_length', type=int, default=20)
-parser.add_argument('--controller_decoder_length', type=int, default=40)
-parser.add_argument('--controller_encoder_dropout', type=float, default=0)
-parser.add_argument('--controller_mlp_dropout', type=float, default=0.1)
-parser.add_argument('--controller_decoder_dropout', type=float, default=0)
-parser.add_argument('--controller_l2_reg', type=float, default=1e-4)
-parser.add_argument('--controller_encoder_vocab_size', type=int, default=12)
-parser.add_argument('--controller_decoder_vocab_size', type=int, default=12)
-parser.add_argument('--controller_trade_off', type=float, default=0.8)
-parser.add_argument('--controller_epochs', type=int, default=1000)
-parser.add_argument('--controller_batch_size', type=int, default=100)
-parser.add_argument('--controller_lr', type=float, default=0.001)
-parser.add_argument('--controller_optimizer', type=str, default='adam')
-parser.add_argument('--controller_grad_bound', type=float, default=5.0)
-args = parser.parse_args()
+def build_parser():
+    parser = argparse.ArgumentParser(description='NAO CIFAR-10')
 
-utils.create_exp_dir(args.output_dir, scripts_to_save=glob.glob('*.py'))
+    # Basic model parameters.
+    parser.add_argument('--mode', type=str, default='train', choices=['train', 'test'])
+    parser.add_argument('--data', type=str, default='./data')
+    parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10, cifar100, imagenet'])
+    parser.add_argument('--zip_file', action='store_true', default=False)
+    parser.add_argument('--lazy_load', action='store_true', default=False)
+    parser.add_argument('--output_dir', type=str, default='models')
+    parser.add_argument('--seed', type=int, default=0)
+    parser.add_argument('--child_batch_size', type=int, default=64)
+    parser.add_argument('--child_eval_batch_size', type=int, default=500)
+    parser.add_argument('--child_epochs', type=int, default=150)
+    parser.add_argument('--child_layers', type=int, default=3)
+    parser.add_argument('--child_nodes', type=int, default=5)
+    parser.add_argument('--child_channels', type=int, default=20)
+    parser.add_argument('--child_cutout_size', type=int, default=None)
+    parser.add_argument('--child_grad_bound', type=float, default=5.0)
+    parser.add_argument('--child_lr_max', type=float, default=0.025)
+    parser.add_argument('--child_lr_min', type=float, default=0.001)
+    parser.add_argument('--child_keep_prob', type=float, default=1.0)
+    parser.add_argument('--child_drop_path_keep_prob', type=float, default=0.9)
+    parser.add_argument('--child_l2_reg', type=float, default=3e-4)
+    parser.add_argument('--child_use_aux_head', action='store_true', default=False)
+    parser.add_argument('--child_eval_epochs', type=str, default='30')
+    parser.add_argument('--child_arch_pool', type=str, default=None)
+    parser.add_argument('--child_lr', type=float, default=0.1)
+    parser.add_argument('--child_label_smooth', type=float, default=0.1, help='label smoothing')
+    parser.add_argument('--child_gamma', type=float, default=0.97, help='learning rate decay')
+    parser.add_argument('--child_decay_period', type=int, default=1, help='epochs between two learning rate decays')
+    parser.add_argument('--controller_seed_arch', type=int, default=600)
+    parser.add_argument('--controller_expand', type=int, default=None)
+    parser.add_argument('--controller_new_arch', type=int, default=300)
+    parser.add_argument('--controller_encoder_layers', type=int, default=1)
+    parser.add_argument('--controller_encoder_hidden_size', type=int, default=96)
+    parser.add_argument('--controller_encoder_emb_size', type=int, default=48)
+    parser.add_argument('--controller_mlp_layers', type=int, default=3)
+    parser.add_argument('--controller_mlp_hidden_size', type=int, default=200)
+    parser.add_argument('--controller_decoder_layers', type=int, default=1)
+    parser.add_argument('--controller_decoder_hidden_size', type=int, default=96)
+    parser.add_argument('--controller_source_length', type=int, default=40)
+    parser.add_argument('--controller_encoder_length', type=int, default=20)
+    parser.add_argument('--controller_decoder_length', type=int, default=40)
+    parser.add_argument('--controller_encoder_dropout', type=float, default=0)
+    parser.add_argument('--controller_mlp_dropout', type=float, default=0.1)
+    parser.add_argument('--controller_decoder_dropout', type=float, default=0)
+    parser.add_argument('--controller_l2_reg', type=float, default=1e-4)
+    parser.add_argument('--controller_encoder_vocab_size', type=int, default=12)
+    parser.add_argument('--controller_decoder_vocab_size', type=int, default=12)
+    parser.add_argument('--controller_trade_off', type=float, default=0.8)
+    parser.add_argument('--controller_epochs', type=int, default=1000)
+    parser.add_argument('--controller_batch_size', type=int, default=100)
+    parser.add_argument('--controller_lr', type=float, default=0.001)
+    parser.add_argument('--controller_optimizer', type=str, default='adam')
+    parser.add_argument('--controller_grad_bound', type=float, default=5.0)
+    return parser
+# args = parser.parse_args()
 
-log_format = '%(asctime)s %(message)s'
-logging.basicConfig(stream=sys.stdout, level=logging.INFO,
-    format=log_format, datefmt='%m/%d %I:%M:%S %p')
+# utils.create_exp_dir(args.output_dir, scripts_to_save=glob.glob('*.py'))
+
+# log_format = '%(asctime)s %(message)s'
+# logging.basicConfig(stream=sys.stdout, level=logging.INFO,
+#     format=log_format, datefmt='%m/%d %I:%M:%S %p')
 
 
 class CrossEntropyLabelSmooth(nn.Module):
@@ -108,7 +111,7 @@ def get_builder(dataset):
         return build_imagenet
     
 
-def build_cifar10(model_state_dict=None, optimizer_state_dict=None, **kwargs):
+def build_cifar10(model_state_dict=None, optimizer_state_dict=None, args=None, **kwargs):
     epoch = kwargs.pop('epoch')
     ratio = kwargs.pop('ratio')
     train_transform, valid_transform = utils._data_transforms_cifar10(args.child_cutout_size)
@@ -124,14 +127,14 @@ def build_cifar10(model_state_dict=None, optimizer_state_dict=None, **kwargs):
     train_queue = torch.utils.data.DataLoader(
         train_data, batch_size=args.child_batch_size,
         sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[:split]),
-        pin_memory=True, num_workers=16)
+        pin_memory=True, num_workers=args.num_workers)
     valid_queue = torch.utils.data.DataLoader(
         valid_data, batch_size=args.child_eval_batch_size,
         sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[split:num_train]),
-        pin_memory=True, num_workers=16)
+        pin_memory=True, num_workers=args.num_workers)
     
-    model = NASWSNetworkCIFAR(10, args.child_layers, args.child_nodes, args.child_channels, args.child_keep_prob, args.child_drop_path_keep_prob,
-                       args.child_use_aux_head, args.steps)
+    model = NASWSNetworkCIFAR(10, args.child_layers, args.child_nodes, args.child_channels, args.child_keep_prob,
+                              args.child_drop_path_keep_prob, args.child_use_aux_head, args.steps)
     model = model.cuda()
     train_criterion = nn.CrossEntropyLoss().cuda()
     eval_criterion = nn.CrossEntropyLoss().cuda()
@@ -151,7 +154,7 @@ def build_cifar10(model_state_dict=None, optimizer_state_dict=None, **kwargs):
     return train_queue, valid_queue, model, train_criterion, eval_criterion, optimizer, scheduler
 
 
-def build_cifar100(model_state_dict=None, optimizer_state_dict=None, **kwargs):
+def build_cifar100(model_state_dict=None, optimizer_state_dict=None, args=None, **kwargs):
     epoch = kwargs.pop('epoch')
     ratio = kwargs.pop('ratio')
     train_transform, valid_transform = utils._data_transforms_cifar10(args.cutout_size)
@@ -194,7 +197,7 @@ def build_cifar100(model_state_dict=None, optimizer_state_dict=None, **kwargs):
     return train_queue, valid_queue, model, train_criterion, eval_criterion, optimizer, scheduler
 
 
-def build_imagenet(model_state_dict=None, optimizer_state_dict=None, **kwargs):
+def build_imagenet(model_state_dict=None, optimizer_state_dict=None, args=None, **kwargs):
     ratio = kwargs.pop('ratio')
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     train_transform = transforms.Compose([
@@ -268,7 +271,7 @@ def build_imagenet(model_state_dict=None, optimizer_state_dict=None, **kwargs):
     return train_queue, valid_queue, model, train_criterion, eval_criterion, optimizer, scheduler
 
 
-def child_train(train_queue, model, optimizer, global_step, arch_pool, arch_pool_prob, criterion):
+def child_train(train_queue, model, optimizer, global_step, arch_pool, arch_pool_prob, criterion, args):
     objs = utils.AvgrageMeter()
     top1 = utils.AvgrageMeter()
     top5 = utils.AvgrageMeter()
@@ -325,7 +328,7 @@ def child_valid(valid_queue, model, arch_pool, criterion):
     return valid_acc_list
 
 
-def train_and_evaluate_top_on_cifar10(archs, train_queue, valid_queue):
+def train_and_evaluate_top_on_cifar10(archs, train_queue, valid_queue, args):
     res = []
     train_criterion = nn.CrossEntropyLoss().cuda()
     eval_criterion = nn.CrossEntropyLoss().cuda()
@@ -399,7 +402,7 @@ def train_and_evaluate_top_on_cifar10(archs, train_queue, valid_queue):
     return res
 
 
-def train_and_evaluate_top_on_cifar100(archs, train_queue, valid_queue):
+def train_and_evaluate_top_on_cifar100(archs, train_queue, valid_queue, args):
     res = []
     train_criterion = nn.CrossEntropyLoss().cuda()
     eval_criterion = nn.CrossEntropyLoss().cuda()
@@ -473,7 +476,7 @@ def train_and_evaluate_top_on_cifar100(archs, train_queue, valid_queue):
     return res
 
 
-def train_and_evaluate_top_on_imagenet(archs, train_queue, valid_queue):
+def train_and_evaluate_top_on_imagenet(archs, train_queue, valid_queue, args):
     res = []
     train_criterion = nn.CrossEntropyLoss().cuda()
     eval_criterion = nn.CrossEntropyLoss().cuda()
@@ -545,7 +548,7 @@ def train_and_evaluate_top_on_imagenet(archs, train_queue, valid_queue):
     return res
         
         
-def nao_train(train_queue, model, optimizer):
+def nao_train(train_queue, model, optimizer, args):
     objs = utils.AvgrageMeter()
     mse = utils.AvgrageMeter()
     nll = utils.AvgrageMeter()
@@ -617,7 +620,7 @@ def nao_infer(queue, model, step, direction='+'):
     return new_arch_list
 
 
-def main():
+def main(args, myargs):
     if not torch.cuda.is_available():
         logging.info('no gpu device available')
         sys.exit(1)
@@ -652,7 +655,8 @@ def main():
 
     child_eval_epochs = eval(args.child_eval_epochs)
     build_fn = get_builder(args.dataset)
-    train_queue, valid_queue, model, train_criterion, eval_criterion, optimizer, scheduler = build_fn(ratio=0.9, epoch=-1)
+    train_queue, valid_queue, model, train_criterion, eval_criterion, optimizer, scheduler = build_fn(
+        args=args, ratio=0.9, epoch=-1)
 
     nao = NAO(
         args.controller_encoder_layers,
@@ -687,7 +691,8 @@ def main():
         lr = scheduler.get_lr()[0]
         logging.info('epoch %d lr %e', epoch, lr)
         # sample an arch to train
-        train_acc, train_obj, step = child_train(train_queue, model, optimizer, step, child_arch_pool, child_arch_pool_prob, train_criterion)
+        train_acc, train_obj, step = child_train(
+            train_queue, model, optimizer, step, child_arch_pool, child_arch_pool_prob, train_criterion, args=args)
         logging.info('train_acc %f', train_acc)
     
         if epoch not in eval_points:
@@ -760,7 +765,7 @@ def main():
             nao_valid_dataset, batch_size=args.controller_batch_size, shuffle=False, pin_memory=True)
         nao_optimizer = torch.optim.Adam(nao.parameters(), lr=args.controller_lr, weight_decay=args.controller_l2_reg)
         for nao_epoch in range(1, args.controller_epochs+1):
-            nao_loss, nao_mse, nao_ce = nao_train(nao_train_queue, nao, nao_optimizer)
+            nao_loss, nao_mse, nao_ce = nao_train(nao_train_queue, nao, nao_optimizer, args=args)
             logging.info("epoch %04d train loss %.6f mse %.6f ce %.6f", nao_epoch, nao_loss, nao_mse, nao_ce)
             if nao_epoch % 100 == 0:
                 pa, hs = nao_valid(nao_valid_queue, nao)
@@ -809,11 +814,11 @@ def main():
     # reranking top 5
     top_archs = old_archs[:5]
     if args.dataset == 'cifar10':
-        top_archs_perf = train_and_evaluate_top_on_cifar10(top_archs, train_queue, valid_queue)
+        top_archs_perf = train_and_evaluate_top_on_cifar10(top_archs, train_queue, valid_queue, args=args)
     elif args.dataset == 'cifar100':
-        top_archs_perf = train_and_evaluate_top_on_cifar100(top_archs, train_queue, valid_queue)
+        top_archs_perf = train_and_evaluate_top_on_cifar100(top_archs, train_queue, valid_queue, args=args)
     else:
-        top_archs_perf = train_and_evaluate_top_on_imagenet(top_archs, train_queue, valid_queue)
+        top_archs_perf = train_and_evaluate_top_on_imagenet(top_archs, train_queue, valid_queue, args=args)
     top_archs_sorted_indices = np.argsort(top_archs_perf)[::-1]
     top_archs = [top_archs[i] for i in top_archs_sorted_indices]
     top_archs_perf = [top_archs_perf[i] for i in top_archs_sorted_indices]
@@ -825,5 +830,30 @@ def main():
                 fp.write('{}\n'.format(perf))
   
 
+def run(argv_str=None):
+  from template_lib.utils.config import parse_args_and_setup_myargs, config2args
+  from template_lib.utils.modelarts_utils import prepare_dataset
+  run_script = os.path.relpath(__file__, os.getcwd())
+  args1, myargs, _ = parse_args_and_setup_myargs(argv_str, run_script=run_script, start_tb=False)
+  myargs.args = args1
+  myargs.config = getattr(myargs.config, args1.command)
+
+  if hasattr(myargs.config, 'datasets'):
+    prepare_dataset(myargs.config.datasets, cfg=myargs.config)
+
+  parser = build_parser()
+  args = parser.parse_args([])
+  args = config2args(myargs.config.args, args)
+
+  outdir = os.path.join(myargs.args.outdir, 'NAO')
+  os.makedirs(outdir, exist_ok=True)
+  args.output_dir = outdir
+
+  log_format = '%(asctime)s %(message)s'
+  logging.basicConfig(stream=sys.stdout, level=logging.INFO,
+                      format=log_format, datefmt='%m/%d %I:%M:%S %p')
+
+  main(args, myargs)
+
 if __name__ == '__main__':
-    main()
+  run()

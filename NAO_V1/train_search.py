@@ -272,6 +272,9 @@ def build_imagenet(model_state_dict=None, optimizer_state_dict=None, args=None, 
 
 
 def child_train(train_queue, model, optimizer, global_step, arch_pool, arch_pool_prob, criterion, args):
+    if args.child_train.dummy:
+        return 0, 0, global_step
+
     objs = utils.AvgrageMeter()
     top1 = utils.AvgrageMeter()
     top5 = utils.AvgrageMeter()
@@ -723,7 +726,8 @@ def main(args, myargs):
 
         # Train Encoder-Predictor-Decoder
         logging.info('Training Encoder-Predictor-Decoder')
-        encoder_input = list(map(lambda x: utils.parse_arch_to_seq(x[0], 2) + utils.parse_arch_to_seq(x[1], 2), old_archs))
+        encoder_input = list(
+            map(lambda x: utils.parse_arch_to_seq(x[0], 2) + utils.parse_arch_to_seq(x[1], 2), old_archs))
         # [[conv, reduc]]
         min_val = min(old_archs_perf)
         max_val = max(old_archs_perf)
@@ -757,7 +761,8 @@ def main(args, myargs):
             valid_encoder_target = encoder_target
         logging.info('Train data: {}\tValid data: {}'.format(len(train_encoder_input), len(valid_encoder_input)))
 
-        nao_train_dataset = utils.NAODataset(train_encoder_input, train_encoder_target, True, swap=True if args.controller_expand is None else False)
+        nao_train_dataset = utils.NAODataset(train_encoder_input, train_encoder_target, True,
+                                             swap=True if args.controller_expand is None else False)
         nao_valid_dataset = utils.NAODataset(valid_encoder_input, valid_encoder_target, False)
         nao_train_queue = torch.utils.data.DataLoader(
             nao_train_dataset, batch_size=args.controller_batch_size, shuffle=True, pin_memory=True)
@@ -776,7 +781,8 @@ def main(args, myargs):
         new_archs = []
         max_step_size = 50
         predict_step_size = 0
-        top100_archs = list(map(lambda x: utils.parse_arch_to_seq(x[0], 2) + utils.parse_arch_to_seq(x[1], 2), old_archs[:100]))
+        top100_archs = list(
+            map(lambda x: utils.parse_arch_to_seq(x[0], 2) + utils.parse_arch_to_seq(x[1], 2), old_archs[:100]))
         nao_infer_dataset = utils.NAODataset(top100_archs, None, False)
         nao_infer_queue = torch.utils.data.DataLoader(
             nao_infer_dataset, batch_size=len(nao_infer_dataset), shuffle=False, pin_memory=True)
